@@ -32,6 +32,12 @@ type SQLTemplate struct {
 	SQLExecer
 }
 
+// NewSQLTemplate .
+func NewSQLTemplate(sqlExecer SQLExecer) SQLTemplate {
+	tpl := SQLTemplate{sqlExecer}
+	return tpl
+}
+
 //Create Operation for Template
 
 //Insert .
