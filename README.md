@@ -1,3 +1,3 @@
 # sqlt
 
-a template tool make database CRUD operations easy on go database/sql
+a template tool makes database CRUD operations easy on golang database/sql. 

@@ -26,7 +26,7 @@ type RowMapperCallback func(rscan RowScanner) (interface{}, error)
 
 // SQLTemplate for CRUD
 type SQLTemplate struct {
-	// sql.DB or sql.TX
+	// SQLExecer could be sql.DB or sql.TX
 	// if DB, each statement execute sql with random conn.
 	// if Tx, all statements use the same conn as the Tx's connection
 	SQLExecer
