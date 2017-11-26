@@ -1,6 +1,8 @@
 package sqlt
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 // SQLExecer .
 type SQLExecer interface {
@@ -22,7 +24,7 @@ type RowScannerWithColumnInfo interface {
 }
 
 // RowMapperCallback .
-type RowMapperCallback func(rscan RowScanner) (interface{}, error)
+type RowMapperCallback func(rscan RowScanner) error
 
 // SQLTemplate for CRUD
 type SQLTemplate struct {
@@ -42,7 +44,7 @@ func NewSQLTemplate(sqlExecer SQLExecer) SQLTemplate {
 
 //Insert .
 func (sqlt *SQLTemplate) Insert(insertQuery string, id *int, args ...interface{}) error {
-	res, err := sqlt.Exec(insertQuery, args)
+	res, err := sqlt.Exec(insertQuery, args...)
 	if err != nil {
 		return err
 	}
@@ -56,38 +58,39 @@ func (sqlt *SQLTemplate) Insert(insertQuery string, id *int, args ...interface{}
 }
 
 //Select .
-func (sqlt *SQLTemplate) Select(selectQuery string, rowMapper RowMapperCallback, args ...interface{}) ([]interface{}, error) {
-	rows, err := sqlt.Query(selectQuery, args)
+func (sqlt *SQLTemplate) Select(selectQuery string, rowMapper RowMapperCallback, args ...interface{}) error {
+
+	// https://stackoverflow.com/questions/24878264/how-can-i-build-varidics-of-type-interface-in-go
+	rows, err := sqlt.Query(selectQuery, args...)
+
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer rows.Close()
 
-	ulist := make([]interface{}, 0)
 	for rows.Next() {
-		u, err := rowMapper(rows)
+		err := rowMapper(rows)
 		if err != nil {
-			return ulist, err
+			return err
 		}
-		ulist = append(ulist, u)
 	}
 
-	return ulist, nil
+	return nil
 }
 
 //SelectOne .
-func (sqlt *SQLTemplate) SelectOne(selectQuery string, rowMapper RowMapperCallback, args ...interface{}) (interface{}, error) {
-	row := sqlt.QueryRow(selectQuery, args)
-	u, err := rowMapper(row)
+func (sqlt *SQLTemplate) SelectOne(selectQuery string, rowMapper RowMapperCallback, args ...interface{}) error {
+	row := sqlt.QueryRow(selectQuery, args...)
+	err := rowMapper(row)
 	if err != nil {
-		return u, err
+		return err
 	}
-	return u, nil
+	return nil
 }
 
 //Update .
 func (sqlt *SQLTemplate) Update(updateQuery string, args ...interface{}) (int, error) {
-	res, err := sqlt.Exec(updateQuery, args)
+	res, err := sqlt.Exec(updateQuery, args...)
 	if err != nil {
 		return 0, err
 	}
